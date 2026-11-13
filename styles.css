@@ -1,0 +1,71 @@
+@font-face {
+  font-family: "Barur";
+  src: url("fonts/BarurTrial-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --accent: #ff4400;
+  --bg: #ffffff;
+  --font-display: "Barur", "Rockwell", "Georgia", serif;
+  --font-text: "Neue Haas Grotesk Text Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: var(--bg); color: var(--accent); }
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: max(100svh, 620px);
+  overflow: hidden;
+}
+
+.ganesha {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72.5px;
+  height: 131px;
+  object-fit: cover;
+}
+
+.title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 70.4px;
+  line-height: 58.667px;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.title span,
+.details span { display: block; }
+
+.details {
+  position: absolute;
+  bottom: 144px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-text);
+  font-size: 14px;
+  line-height: normal;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .page { min-height: max(100svh, 700px); }
+  .title { font-size: 108px; line-height: 90px; }
+  .details { bottom: 108px; }
+}
