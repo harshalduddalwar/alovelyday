@@ -1,6 +1,6 @@
 // RSVPs are emailed through FormSubmit (https://formsubmit.co), since GitHub Pages has no backend.
 // After the first submission, FormSubmit sends an activation email to this address; click it once.
-const RSVP_ENDPOINT = "https://formsubmit.co/ajax/harshaladuddalwar@gmail.com";
+const RSVP_ENDPOINT = "https://formsubmit.co/ajax/alovelyday.us@gmail.com";
 
 const dialog = document.getElementById("rsvp");
 const form = document.getElementById("rsvp-form");
@@ -79,7 +79,12 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error(res.status);
+    // FormSubmit answers 200 even when it didn't send (e.g. not activated yet), so check its reply
+    const reply = await res.json().catch(() => ({}));
+    if (!res.ok || String(reply.success) !== "true") {
+      console.warn("RSVP not sent:", res.status, reply);
+      throw new Error(reply.message || res.status);
+    }
 
     document.getElementById("rsvp-done-text").textContent =
       attending === "Yes"
@@ -87,9 +92,10 @@ form.addEventListener("submit", async (e) => {
         : "We'll miss you, and thank you for letting us know.";
     form.hidden = true;
     done.hidden = false;
-  } catch {
+  } catch (err) {
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
-    showError("Your RSVP didn't send. Check your connection and try again.");
+    const detail = err && err.message && isNaN(err.message) ? ` (${err.message})` : "";
+    showError(`Your RSVP didn't send. Please try again in a moment.${detail}`);
   }
 });
