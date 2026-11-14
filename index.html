@@ -21,11 +21,61 @@
       <span>day</span>
     </h1>
 
-    <p class="details">
-      <span>Shivani &amp; Harshal</span>
-      <span>27 March, 2027; Los Angeles</span>
-      <span>NYC to follow</span>
-    </p>
+    <div class="footer">
+      <p class="details">
+        <span>Shivani &amp; Harshal</span>
+        <span>27 March, 2027; Los Angeles</span>
+        <span>NYC to follow</span>
+      </p>
+      <button type="button" class="btn" id="rsvp-open">RSVP</button>
+    </div>
   </main>
+
+  <dialog class="rsvp" id="rsvp" aria-labelledby="rsvp-title">
+    <button type="button" class="rsvp-close" id="rsvp-close" aria-label="Close">&times;</button>
+
+    <form id="rsvp-form" class="rsvp-form" novalidate>
+      <h2 class="rsvp-title" id="rsvp-title">RSVP</h2>
+
+      <label class="field">
+        <span>Your name</span>
+        <input type="text" id="rsvp-name" name="Name" autocomplete="name" required>
+      </label>
+
+      <fieldset class="field">
+        <legend>Will you be attending?</legend>
+        <div class="choice">
+          <label><input type="radio" id="rsvp-yes" name="Attending" value="Yes" required><span>Yes</span></label>
+          <label><input type="radio" id="rsvp-no" name="Attending" value="No"><span>No</span></label>
+        </div>
+      </fieldset>
+
+      <div class="yes-only" id="rsvp-yes-fields" hidden>
+        <label class="field">
+          <span>Number of people</span>
+          <input type="number" id="rsvp-guests" name="Guests" min="1" max="20" value="1" inputmode="numeric">
+        </label>
+      </div>
+
+      <label class="field" id="rsvp-message-field" hidden>
+        <span>Note or message (optional)</span>
+        <textarea id="rsvp-message" name="Message" rows="3"></textarea>
+      </label>
+
+      <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <p class="rsvp-error" id="rsvp-error" role="alert" hidden></p>
+
+      <button type="submit" class="btn" id="rsvp-submit">Submit</button>
+    </form>
+
+    <div class="rsvp-done" id="rsvp-done" hidden>
+      <h2 class="rsvp-title">Thank you</h2>
+      <p id="rsvp-done-text"></p>
+      <button type="button" class="btn" id="rsvp-done-close">Close</button>
+    </div>
+  </dialog>
+
+  <script src="rsvp.js"></script>
 </body>
 </html>
