@@ -5,191 +5,169 @@
   font-display: swap;
 }
 
+/* Mobile first: the title opens large in the middle of the screen and shrinks
+   to the top as you scroll; the story, Ganesha and photo follow in one column. */
 :root {
   --accent: #ff4400;
-  --bg: #ffffff;
+  --bg: #fffbec;
   --font-display: "Barur", "Rockwell", "Georgia", serif;
   --font-text: "Neue Haas Grotesk Text Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --vh: 100svh;            /* replaced with a stable pixel height by main.js */
+  --peek: 72px;            /* how much of the story shows below the fold */
+  --title-size: 72px;      /* opening size */
+  --story-top: 210px;     /* where the story sits once the title has docked */
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body { background: var(--bg); color: var(--accent); }
 
-.page {
-  position: relative;
-  min-height: 100vh;
-  min-height: 100svh;
-  min-height: max(100svh, 620px);
-  overflow: hidden;
+body {
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
 }
 
-.ganesha {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 72.5px;
-  height: 131px;
-  object-fit: cover;
+/* Title: fixed for the whole page; starts large in the middle, docks small at the top.
+   The band behind it fades the page content out as it scrolls up underneath. */
+.title-band {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to bottom, var(--bg) 0, var(--bg) 130px, rgba(255, 251, 236, 0) 200px);
+  opacity: var(--p, 0);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .title {
-  position: absolute;
-  top: 50%;
+  position: fixed;
+  top: 30px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: max-content;
+  pointer-events: none;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 70.4px;
-  line-height: 58.667px;
-  text-transform: uppercase;
+  font-size: var(--title-size);
+  line-height: 0.84;
   text-align: center;
+  text-transform: uppercase;
   white-space: nowrap;
+  transform-origin: 50% 0;
+  /* main.js sets the transform; this is the opening state */
+  transform: translate(-50%, calc(var(--vh) / 2 - 30px - 1.26 * var(--title-size)));
 }
 
-.title span,
-.details span { display: block; }
+.title span { display: block; }
 
-.footer {
-  position: absolute;
-  top: calc(100% - 195px);
-  left: 50%;
-  transform: translateX(-50%);
+/* Content */
+.content {
+  padding-top: calc(var(--vh) - var(--peek));
+  padding-bottom: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
 }
 
-.details {
-  font-family: var(--font-text);
+.story {
+  width: 100%;
+  max-width: calc(322px + 32px);
+  padding-inline: 16px;
   font-size: 14px;
   line-height: normal;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
+  text-align: justify;
+  hyphens: manual;
 }
+.story p + p { margin-top: 1.2em; }
 
-/* Buttons */
-.btn {
-  font-family: var(--font-text);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid var(--accent);
-  padding: 8px 22px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+.ganesha {
+  margin-top: 100px;
+  width: 48.855px;
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+  mix-blend-mode: darken;
 }
-.btn:hover, .btn:focus-visible { background: var(--accent); color: var(--bg); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.btn:disabled { opacity: 0.6; cursor: default; }
-
-/* RSVP dialog */
-.rsvp {
-  width: min(380px, calc(100vw - 32px));
-  margin: auto;
-  padding: 40px 28px 32px;
-  border: 1px solid var(--accent);
-  background: var(--bg);
-  color: var(--accent);
-  font-family: var(--font-text);
-}
-.rsvp::backdrop { background: rgba(255, 255, 255, 0.85); }
-
-.rsvp-close {
+.ganesha img {
   position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 26px;
-  line-height: 1;
-  color: var(--accent);
-  background: none;
-  border: 0;
-  cursor: pointer;
+  top: 0;
+  left: -6.25%;
+  width: 113.27%;
+  height: 100%;
+  max-width: none;
 }
 
-.rsvp-form, .rsvp-done {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  text-align: center;
+.photo {
+  margin-top: 100px;
+  width: calc(100% - 20px);
+  max-width: 382px;
+  aspect-ratio: 382 / 305.6;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
 }
-.rsvp-form[hidden], .rsvp-done[hidden] { display: none; }
-
-.rsvp-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 44px;
-  line-height: 1;
-  text-transform: uppercase;
+.photo img {
+  position: absolute;
+  left: -18.97%;
+  top: -3.34%;
+  width: 127.14%;
+  height: 105.37%;
+  max-width: none;
+  object-fit: cover;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  border: 0;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+/* Wider phones and small tablets: let the photo grow with the screen */
+@media (min-width: 480px) {
+  .photo { max-width: 460px; }
 }
-.field[hidden], .yes-only[hidden] { display: none; }
-.yes-only { width: 100%; }
-.field legend { margin-bottom: 10px; }
 
-.field input[type="text"],
-.field input[type="number"],
-.field textarea {
-  width: 100%;
-  font: 16px var(--font-text);
-  color: var(--accent);
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--accent);
-  border-radius: 0;
-  padding: 6px 2px;
-  text-align: center;
-  outline: none;
+/* Laptop: story and photo side by side, Ganesha closing the page */
+@media (min-width: 960px) {
+  :root {
+    --title-size: 108px;
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: minmax(0, 420px) minmax(0, 560px);
+    grid-template-areas:
+      "story photo"
+      "ganesha ganesha";
+    justify-content: center;
+    column-gap: clamp(56px, 7vw, 120px);
+    padding-inline: 40px;
+    padding-bottom: 80px;
+  }
+
+  .story {
+    grid-area: story;
+    max-width: none;
+    padding-inline: 0;
+    font-size: 15px;
+    line-height: 1.32;
+  }
+
+  .photo {
+    grid-area: photo;
+    margin-top: 0;
+    width: 100%;
+    max-width: none;
+    align-self: start;
+    position: sticky;
+    top: var(--story-top);
+  }
+
+  .ganesha {
+    grid-area: ganesha;
+    justify-self: center;
+    margin-top: 120px;
+  }
 }
-.field textarea {
-  border: 1px solid var(--accent);
-  text-align: left;
-  resize: vertical;
-}
-.field input:focus, .field textarea:focus { border-color: var(--accent); box-shadow: 0 1px 0 var(--accent); }
-
-.choice { display: flex; justify-content: center; gap: 12px; }
-.choice label { cursor: pointer; }
-.choice input { position: absolute; opacity: 0; pointer-events: none; }
-.choice span {
-  display: inline-block;
-  min-width: 80px;
-  padding: 8px 18px;
-  border: 1px solid var(--accent);
-  font-size: 12px;
-}
-.choice input:checked + span { background: var(--accent); color: var(--bg); }
-.choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 3px; }
-
-.honey { position: absolute; left: -9999px; }
-
-.rsvp-error { font-size: 13px; }
-.rsvp-error[hidden] { display: none; }
-
-.rsvp-done p { font-size: 14px; line-height: 1.4; }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn { transition: none; }
-}
-
-@media (min-width: 768px) {
-  .page { min-height: max(100svh, 700px); }
-  .title { font-size: 108px; line-height: 90px; }
-  .footer { top: calc(100% - 159px); }
+  .title { will-change: auto; }
 }
