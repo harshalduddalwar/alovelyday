@@ -1,57 +1,49 @@
-// Shrinks the title from the middle of the screen to the top as the page scrolls,
-// then keeps it fixed there. --p (0 → 1) also fades in the band behind the title,
-// so the page content fades out as it scrolls up underneath.
+// The title's shrink-to-the-top is a CSS scroll-driven animation (see styles.css).
+// This script only:
+//  1. pins --vh to a stable pixel height, so the mobile address bar showing and
+//     hiding doesn't make the layout or the animation jump, and
+//  2. animates the title itself in browsers without CSS scroll timelines.
 const root = document.documentElement;
 const title = document.getElementById("title");
+const band = document.querySelector(".title-band");
 
-const DOCK_TOP = 30;   // title's top edge once docked
-const SMALL_SIZE = 24; // docked font size in px
-
-let vh = 0;
 let width = 0;
-let distance = 1;
-let bigHeight = 0;
-let endScale = 0.5;
 
-function measure() {
-  // Only re-measure the height when the width changes, so the mobile address bar
-  // showing and hiding doesn't make the layout jump.
-  if (window.innerWidth !== width || !vh) {
-    width = window.innerWidth;
-    vh = window.innerHeight;
-    root.style.setProperty("--vh", `${vh}px`);
-  }
-
-  const styles = getComputedStyle(root);
-  const peek = parseFloat(styles.getPropertyValue("--peek"));
-  const storyTop = parseFloat(styles.getPropertyValue("--story-top"));
-  const bigSize = parseFloat(getComputedStyle(title).fontSize);
-
-  bigHeight = title.offsetHeight;
-  endScale = SMALL_SIZE / bigSize;
-  distance = Math.max(1, vh - peek - storyTop);
-  update();
+function setViewportHeight() {
+  if (window.innerWidth === width) return;
+  width = window.innerWidth;
+  root.style.setProperty("--vh", `${window.innerHeight}px`);
 }
 
-function update() {
-  const p = Math.min(1, Math.max(0, window.scrollY / distance));
-  const startY = vh / 2 - bigHeight / 2 - DOCK_TOP;
-  const y = (1 - p) * startY;
-  const s = 1 - (1 - endScale) * p;
-  title.style.transform = `translate(-50%, ${y}px) scale(${s})`;
-  root.style.setProperty("--p", p.toFixed(3));
-}
+setViewportHeight();
+window.addEventListener("resize", setViewportHeight);
 
-let ticking = false;
-window.addEventListener("scroll", () => {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => {
+if (!CSS.supports("animation-timeline: scroll()")) {
+  const px = (name) => parseFloat(getComputedStyle(root).getPropertyValue(name));
+  let distance = 1;
+  let startY = 0;
+  let endScale = 0.5;
+
+  const measure = () => {
+    const vh = window.innerHeight;
+    const titleSize = parseFloat(getComputedStyle(title).fontSize);
+    distance = Math.max(1, vh - px("--peek") - px("--story-top"));
+    startY = vh / 2 - 30 - 1.26 * titleSize;
+    endScale = px("--end-scale");
     update();
-    ticking = false;
-  });
-}, { passive: true });
+  };
 
-window.addEventListener("resize", measure);
-document.fonts.ready.then(measure);
-measure();
+  // Writes only transform and opacity, which the browser can update without
+  // re-laying out the page.
+  const update = () => {
+    const p = Math.min(1, Math.max(0, window.scrollY / distance));
+    const s = 1 - (1 - endScale) * p;
+    title.style.transform = `translate3d(-50%, ${(1 - p) * startY}px, 0) scale(${s})`;
+    band.style.opacity = p;
+  };
+
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", measure);
+  document.fonts.ready.then(measure);
+  measure();
+}

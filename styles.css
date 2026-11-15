@@ -17,6 +17,11 @@
   --peek: 72px;            /* how much of the story shows below the fold */
   --title-size: 72px;      /* opening size */
   --story-top: 210px;     /* where the story sits once the title has docked */
+  --end-scale: 0.3333;     /* docked size: 24px / 72px */
+
+  /* Derived: how far the title travels, and how far you scroll while it does */
+  --start-y: calc(var(--vh) / 2 - 30px - 1.26 * var(--title-size));
+  --dock-distance: calc(var(--vh) - var(--peek) - var(--story-top));
   color-scheme: light;
 }
 
@@ -38,7 +43,8 @@ body {
   right: 0;
   height: 200px;
   background: linear-gradient(to bottom, var(--bg) 0, var(--bg) 130px, rgba(255, 251, 236, 0) 200px);
-  opacity: var(--p, 0);
+  opacity: 0;
+  will-change: opacity;
   pointer-events: none;
   z-index: 1;
 }
@@ -58,11 +64,35 @@ body {
   text-transform: uppercase;
   white-space: nowrap;
   transform-origin: 50% 0;
-  /* main.js sets the transform; this is the opening state */
-  transform: translate(-50%, calc(var(--vh) / 2 - 30px - 1.26 * var(--title-size)));
+  transform: translate3d(-50%, var(--start-y), 0) scale(1);
+  will-change: transform;
 }
 
 .title span { display: block; }
+
+/* The shrink is tied straight to the scroll position, so the browser animates it
+   on its own every frame. Browsers without scroll timelines use main.js instead. */
+@keyframes title-dock {
+  from { transform: translate3d(-50%, var(--start-y), 0) scale(1); }
+  to   { transform: translate3d(-50%, 0, 0) scale(var(--end-scale)); }
+}
+@keyframes band-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@supports (animation-timeline: scroll()) {
+  .title,
+  .title-band {
+    animation-duration: auto;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+    animation-range: 0px var(--dock-distance);
+  }
+  .title { animation-name: title-dock; }
+  .title-band { animation-name: band-in; }
+}
 
 /* Content */
 .content {
@@ -129,6 +159,7 @@ body {
 @media (min-width: 960px) {
   :root {
     --title-size: 108px;
+    --end-scale: 0.2222;   /* 24px / 108px */
   }
 
   .content {
