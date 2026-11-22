@@ -114,6 +114,16 @@ body {
 }
 .story p + p { margin-top: 1.2em; }
 
+/* Small raised label naming who wrote the story */
+.story-by {
+  font-size: 0.68em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 0;          /* keeps the first line's spacing even */
+  vertical-align: 0.55em;
+}
+
 .ganesha {
   margin-top: 100px;
   width: 48.855px;
@@ -188,8 +198,6 @@ body {
     width: 100%;
     max-width: none;
     align-self: start;
-    position: sticky;
-    top: var(--story-top);
   }
 
   .ganesha {
